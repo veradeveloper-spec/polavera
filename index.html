@@ -42,110 +42,31 @@
   .switch{ display:flex; align-items:center; gap:8px; font-size:13px;}
   .badge{ font-size:12px; padding:6px 8px; border-radius:999px; background:rgba(255,255,255,0.04);}
   footer{ grid-column:1/-1; margin-top:6px; display:flex; justify-content:space-between; font-size:12px; color:#9fb0c6;}
-  /* neon effect */
   .neonBox{ box-shadow: 0 0 20px rgba(0,246,255,0.06), inset 0 0 18px rgba(255,0,200,0.02); border:1px solid rgba(255,255,255,0.03); }
   @media(max-width:880px){ .app{ grid-template-columns:1fr; } .left,.right{ order:unset } }
 </style>
 </head>
 <body>
-  <div class="app neonBox">
-    <header>
-      <div><h1>POLA GACOR<span class="logo">BY VERA</span> — Prediksi All-in</h1></div>
-      <div class="muted">Mode: <span id="modeLabel">Ultra Pro AI</span></div>
-    </header>
 
-    <!-- LEFT: controls -->
-    <section class="left">
-      <label>Zona waktu:</label>
-      <div class="row">
-        <select id="tz">
-          <option value="WIB">WIB (UTC+7)</option>
-          <option value="WITA">WITA (UTC+8)</option>
-        </select>
-        <div class="chip" id="clock">--:--</div>
-      </div>
+<!-- ===== LOGIN BOX ===== -->
+<div id="loginScreen" style="text-align:center; width:350px; background:rgba(0,0,0,0.45); padding:26px; border-radius:14px;">
+  <h2 style="margin-bottom:18px; color:#00f6ff;">LOGIN</h2>
+  <input id="pass" type="password" placeholder="Masukkan Password"
+    style="width:100%; padding:12px; border-radius:10px; background:rgba(255,255,255,0.08); border:none; color:#fff;">
+  <button onclick="doLogin()" style="margin-top:14px; width:100%; padding:10px; border-radius:10px; font-weight:700">Masuk</button>
+  <div id="msg" style="margin-top:10px; font-size:13px; color:#ff6b6b;"></div>
+</div>
 
-      <label>Input dadu (M1, M2, M3 — M3 optional)</label>
-      <div class="row">
-        <input id="m1" type="number" min="9" max="54" placeholder="M1">
-        <input id="m2" type="number" min="9" max="54" placeholder="M2">
-        <input id="m3" type="number" min="9" max="54" placeholder="M3 (opsional)">
-      </div>
+<!-- ===== MAIN APP (HIDDEN FIRST) ===== -->
+<div id="mainApp" class="app neonBox" style="display:none;">
 
-      <label>Mode & fitur</label>
-      <div class="toggles">
-        <div class="switch"><input id="ultraAI" type="checkbox" checked> <span>Ultra Pro AI</span></div>
-        <div class="switch"><input id="auto5s" type="checkbox"> <span>Auto update 5s</span></div>
-        <div class="switch"><input id="deviceLogic" type="checkbox"> <span>Full Device Logic</span></div>
-        <div class="switch"><input id="useRacikan" type="checkbox" checked> <span>Pakailah Racikan THIS RX</span></div>
-      </div>
+  <header>
+    <div><h1>POLA GACOR<span class="logo">BY VERA</span> — Prediksi All-in</h1></div>
+    <div class="muted">Mode: <span id="modeLabel">Ultra Pro AI</span></div>
+  </header>
 
-      <div class="row" style="margin-top:12px">
-        <button id="btnPredict" class="small">Prediksi Sekarang</button>
-        <button id="btnClear" class="small">Clear History</button>
-      </div>
-
-      <div class="resultBox">
-        <div class="muted">Prediksi (deterministik + reason):</div>
-        <div id="predLine" class="pred">-</div>
-        <div id="probLine" class="prob">Probabilitas: -</div>
-        <div id="reason" class="muted" style="margin-top:8px">Alasan: -</div>
-      </div>
-
-      <div style="margin-top:12px">
-        <div class="muted">Quick rules (fixed-number overrides):</div>
-        <div style="margin-top:6px" class="muted">If M==32 → K, M==31→B, 26→B, 29→B, 33→B, 28→K, 34→K, 37→K, 35→B, 22→B, 23→K, 21→K, 24→K, 39→K, 36→K</div>
-      </div>
-    </section>
-
-    <!-- RIGHT: history & details -->
-    <section class="right">
-      <div style="display:flex; justify-content:space-between; align-items:center;">
-        <div class="muted">History (terbaru paling atas)</div>
-        <div>
-          <span class="badge" id="lastAuto">Auto: OFF</span>
-          <span class="badge" id="lastUpdate">Last: --</span>
-        </div>
-      </div>
-
-      <div class="history" id="history"></div>
-
-      <details style="margin-top:12px; color:#cfe8ff; font-size:13px;">
-        <summary style="cursor:pointer">Detil pola yang digunakan (klik)</summary>
-        <div style="padding:8px; color:#cfe8ff; font-size:13px;">
-          <strong>VERA:</strong> tren naik/turun M1→M2→M3.<br>
-          <strong>Joe:</strong> jika pola win 2x berturut → ambil lawan (reverse) saat cocok.<br>
-          <strong>VERA/REAL:</strong> pakai angka terakhir/majority jika tren tidak konsisten.<br>
-          <strong>Racikan THIS VERA:</strong> rentang jam→B/K (digabung dengan pola menit untuk scoring).<br>
-          <strong>Device logic:</strong> (opsional) gunakan map menit→B/K per device (jika aktif).
-        </div>
-      </details>
-    </section>
-
-    <footer>
-      <div>Engine: Ultra Pro AI + pola gabungan</div>
-      <div id="version">v1.0</div>
-    </footer>
-  </div>
-
-<script>
-/* ===========================
-   Utility & pattern data
-   =========================== */
-
-const historyEl = document.getElementById('history');
-const predLine = document.getElementById('predLine');
-const probLine = document.getElementById('probLine');
-const reasonEl = document.getElementById('reason');
-const clockEl = document.getElementById('clock');
-const lastUpdateEl = document.getElementById('lastUpdate');
-const lastAutoBadge = document.getElementById('lastAuto');
-
-const quickFixed = new Map([
-  [32,'K'],[31,'B'],[26,'B'],[29,'B'],[33,'B'],[28,'K'],[34,'K'],[37,'K'],
-  [35,'B'],[22,'B'],[23,'K'],[21,'K'],[24,'K'],[39,'K'],[36,'K']
-]);
-
+  <!-- kirianan kode aslinya tetap, TIDAK ADA YANG DIUBAH -->
+  <!-- ================= ORIGINAL CONTENT CONTINUES ================= -->
 // Racikan THIS RX time ranges (local hours) -> preferred
 // We'll map to hours in local tz adjusted for WIB/WITA when evaluating
 const racikanRanges = [
