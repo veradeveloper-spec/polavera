@@ -491,7 +491,7 @@ btnLogin.addEventListener('click', () => {
   const u = document.getElementById('user').value;
   const p = document.getElementById('pass').value;
 
-  if (u === "admin" && p === "1234") {
+  if (u === "vera" && p === "gacor") {
     localStorage.setItem("loggedIn", "true");
     checkLogin();
   } else {
@@ -503,9 +503,9 @@ btnLogout.addEventListener('click', () => {
   localStorage.removeItem("loggedIn");
   checkLogin();
 });
-
 // Jalankan saat halaman dibuka
 checkLogin();
+  
 </script>
 </body>
 </html>
