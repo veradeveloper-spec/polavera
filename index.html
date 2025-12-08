@@ -76,7 +76,6 @@
 style="width:100%; padding:12px; margin-top:10px; border-radius:10px; background:#00f6ff; color:#000; font-weight:800;">
 ADMIN PANEL
 </button>
-    </div>
 
     <p id="loginMsg" style="margin-top:10px; color:#ff6b6b; font-size:14px;"></p>
   </div>
@@ -482,20 +481,19 @@ tzEl.addEventListener('change', ()=> { updateClock(); doPredict(true); });
 // on load: populate with nothing. If user wants demo, can type or we could prefill.
 // optional: prefill with example (uncomment to demo):
 // m1El.value=35; m2El.value=30; m3El.value='';
-
 function login(){
   const u = document.getElementById("user").value;
   const p = document.getElementById("pass").value;
 
-  // ADMIN LOGIN
+  // Login Admin
   if(u === "admin" && p === "admin123"){
-    localStorage.setItem("role","admin");
     localStorage.setItem("loginVera","true");
+    localStorage.setItem("role","admin");
     showApp();
     return;
   }
 
-  // USER BIASA LOGIN
+  // Login User Biasa
   let users = JSON.parse(localStorage.getItem("users")) || [];
   let usr = users.find(x => x.username === u && x.password === p);
 
@@ -516,23 +514,6 @@ function login(){
   localStorage.setItem("role","user");
   showApp();
 }
-function showApp(){
-  document.getElementById("loginPage").style.display="none";
-  document.getElementById("app").style.display="block";
-
-  if(localStorage.getItem("role") === "admin"){
-    document.getElementById("adminButton").style.display="block";
-  } else {
-    document.getElementById("adminButton").style.display="none";
-  }
-}
-... fungsi checkExpired dll ...
-
-// code admin panel
-function openAdminPanel(){ ... }
-function closeAdmin(){ ... }
-function addUser(){ ... }
-
 </script>
 </body>
 </html>
