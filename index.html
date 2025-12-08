@@ -605,6 +605,15 @@ if(localStorage.getItem("loginVera") === "true"){
 } else {
   showLogin();
 }
+  function openPopup(){
+  document.getElementById("popupCS").style.display = "flex";
+  document.querySelector(".floating-wrap").style.display = "none";
+}
+
+function closePopup(){
+  document.getElementById("popupCS").style.display = "none";
+  document.querySelector(".floating-wrap").style.display = "flex";
+}
 </script>
 <!-- Floating Contact Buttons -->
 <div class="<!-- POPUP CS -->
