@@ -481,38 +481,22 @@ tzEl.addEventListener('change', ()=> { updateClock(); doPredict(true); });
 // on load: populate with nothing. If user wants demo, can type or we could prefill.
 // optional: prefill with example (uncomment to demo):
 // m1El.value=35; m2El.value=30; m3El.value='';
+function showApp(){
+  document.getElementById("loginPage").style.display = "none";
+  document.getElementById("app").style.display = "block";
+}
+
 function login(){
   const u = document.getElementById("user").value;
   const p = document.getElementById("pass").value;
 
-  // Login Admin
   if(u === "admin" && p === "admin123"){
     localStorage.setItem("loginVera","true");
-    localStorage.setItem("role","admin");
     showApp();
     return;
   }
 
-  // Login User Biasa
-  let users = JSON.parse(localStorage.getItem("users")) || [];
-  let usr = users.find(x => x.username === u && x.password === p);
-
-  if(!usr){
-    alert("Akun tidak ditemukan!");
-    return;
-  }
-
-  // cek expired
-  const now = new Date();
-  const exp = new Date(usr.expire);
-  if(now > exp){
-    alert("Masa sewa habis! Hubungi admin.");
-    return;
-  }
-
-  localStorage.setItem("loginVera","true");
-  localStorage.setItem("role","user");
-  showApp();
+  alert("Login salah bre");
 }
 </script>
 </body>
