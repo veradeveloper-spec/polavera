@@ -570,6 +570,18 @@
   <button onclick="openAdminFromRenter()" style="position:absolute; top:10px; right:10px; background:none; border:none; color:#999; font-size:12px;">Admin</button>
 </section>
 <script>
+  let renterActive=null;
+async function doRenterLogin(){
+  const u=document.getElementById('rentUser').value.trim();
+  const p=document.getElementById('rentPass').value.trim();
+  const m=document.getElementById('renterMsg');
+  try{
+    const r=await window.renterLogin(u,p);
+    renterActive=r;
+    document.getElementById('renterLoginPage').style.display='none';
+  }catch(e){ m.innerText=e.message; }
+}
+</script>
 <script>
 function openAdminFromRenter(){ document.getElementById('panelAdmin').style.display='block'; }
 </script>
