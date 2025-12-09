@@ -581,6 +581,12 @@ async function doRenterLogin(){
     document.getElementById('renterLoginPage').style.display='none';
   }catch(e){ m.innerText=e.message; }
 }
+  function renterLogout() {
+  localStorage.removeItem("renter_username");
+  localStorage.removeItem("renter_expires");
+  alert("Logout berhasil");
+  document.getElementById("renterLoginPage").style.display = "flex";
+  }
 </script>
 <script>
 function openAdminFromRenter(){ document.getElementById('panelAdmin').style.display='block'; }
