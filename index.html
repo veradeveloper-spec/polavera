@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>VERA — Sistem Gabungan + Sewa</title>
+<title>POLA GACOR BY VERA</title>
 <style>
   :root{
     --bg1:#0f0c29; --bg2:#302b63; --card: rgba(0,0,0,0.6);
@@ -50,7 +50,7 @@
   <!-- Topbar -->
   <div class="topbar">
     <div class="dotmenu" id="openDrawer" title="Menu">⋮</div>
-    <div class="title">VERA — Gabungan Pola + Sewa</div>
+    <div class="title">POLA GACOR BY VERA </div>
     <div style="margin-left:auto" class="muted">v1.0</div>
   </div>
 
@@ -71,6 +71,10 @@
       <option value="WITA">WITA (UTC+8)</option>
     </select>
     <div style="margin-top:12px">
+      <button onclick="renterLogout()" 
+ style="margin-top:10px;padding:8px 15px;border-radius:8px;border:none;background:#ff4444;color:white;">
+  Logout
+      </button>
       <button class="btn" id="closeDrawerBtn">Tutup Menu</button>
     </div>
   </aside>
@@ -578,6 +582,12 @@ async function doRenterLogin(){
   }catch(e){ m.innerText=e.message; }
 }
 </script>
+  function renterLogout() {
+  localStorage.removeItem("renter_username");
+  localStorage.removeItem("renter_expires");
+  alert("Logout berhasil");
+  document.getElementById("renterLoginPage").style.display = "flex";
+}
 <script>
 function openAdminFromRenter(){ document.getElementById('panelAdmin').style.display='block'; }
 </script>
