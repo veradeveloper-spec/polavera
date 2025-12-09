@@ -569,15 +569,15 @@
   <div id="renterMsg" style="color:#ff4444;margin-top:10px"></div>
   <button onclick="openAdminFromRenter()" style="position:absolute; top:10px; right:10px; background:none; border:none; color:#999; font-size:12px;">Admin</button>
 </section>
-  function renterLogout() {
+<script>
+<script>
+function openAdminFromRenter(){ document.getElementById('panelAdmin').style.display='block'; }
+function renterLogout() {
   localStorage.removeItem("renter_username");
   localStorage.removeItem("renter_expires");
   alert("Logout berhasil");
   document.getElementById("renterLoginPage").style.display = "flex";
 }
-<script>
-<script>
-function openAdminFromRenter(){ document.getElementById('panelAdmin').style.display='block'; }
 </script>
 </body>
 </html>
