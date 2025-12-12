@@ -1,0 +1,520 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>POLA GACOR BY VERA</title>
+  <style>
+    :root{--bg1:#0f0c29; --bg2:#302b63; --card: rgba(0,0,0,0.6); --neon:#00f6ff; --accent:#ffd700}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,Arial,Helvetica,sans-serif;background:linear-gradient(135deg,var(--bg1),var(--bg2));color:#fff;min-height:100vh}
+    .topbar{height:60px;display:flex;align-items:center;gap:12px;padding:10px 18px;position:relative;z-index:10}
+    .dotmenu{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.02);cursor:pointer}
+    .title{font-weight:800;color:var(--neon);font-size:18px}
+    .container{display:flex;gap:18px;padding:18px;max-width:1100px;margin:0 auto}
+    .panel{background:var(--card);padding:14px;border-radius:12px;flex:1;min-width:280px}
+    .muted{color:#9fb0c6;font-size:13px}
+    .pred{font-size:40px;font-weight:900;text-align:center;margin:8px 0}
+    .pred.B{color:#00ff85}
+    .pred.K{color:#ff6b6b}
+    .btn{padding:10px 14px;border-radius:10px;border:none;background:var(--accent);color:#000;font-weight:800;cursor:pointer}
+    input,select,textarea{padding:8px;border-radius:8px;border:none;background:rgba(255,255,255,0.03);color:#fff}
+    .drawer{position:fixed;left:-100%;top:0;width:80%;max-width:320px;height:100vh;background:rgba(8,8,10,0.96);backdrop-filter:blur(10px);padding:18px;box-shadow:8px 0 40px rgba(0,0,0,0.6);transition:left .28s ease;z-index:9999}
+    .drawer.open{left:0}
+    .drawer h3{margin:6px 0 12px;color:var(--neon)}
+    .modeBtn{display:block;width:100%;text-align:left;padding:10px;border-radius:10px;border:none;background:rgba(255,255,255,0.02);color:#fff;margin-bottom:8px;cursor:pointer}
+    .footer{position:fixed;right:18px;bottom:18px;color:#9fb0c6;font-size:12px;z-index:5}
+    .resultBox{margin-top:12px;padding:12px;border-radius:10px;background:linear-gradient(90deg, rgba(0,0,0,0.25), rgba(255,255,255,0.02));}
+    .history-box{max-height:260px;overflow:auto;margin-top:8px;background:rgba(0,0,0,0.12);padding:8px;border-radius:8px}
+    #overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.55);backdrop-filter:blur(2px);display:none;z-index:9990}
+    @media(max-width:880px){.container{flex-direction:column;padding:12px}.drawer{width:92%}}
+    /* small styles for inputs and checks */
+    .small-input{width:80px;padding:8px;border-radius:8px;background:#071025;border:1px solid rgba(255,255,255,0.03);color:#d6ecff}
+    .checks{display:flex;gap:8px;margin-top:10px}
+    .checks label{background:#071025;padding:8px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);cursor:pointer}
+    .checks label.active{background:var(--accent);color:#000;border-color:var(--accent);box-shadow:0 0 8px #ffd70066}
+  </style>
+</head>
+<body>
+  <div id="overlay" aria-hidden="true"></div>
+  <div class="topbar">
+    <div class="dotmenu" id="openDrawer" title="Menu">⋮</div>
+    <div class="title">POLA GACOR BY VERA</div>
+    <div style="margin-left:auto" class="muted">v1.0</div>
+    <button id="openRenterLogin" style="margin-left:12px;padding:6px 10px;border-radius:6px;border:none;background:var(--accent);color:#000;font-weight:700;cursor:pointer">Login Penyewa</button>
+  </div>
+
+  <aside class="drawer" id="drawer" aria-hidden="true">
+    <h3>Menu</h3>
+    <button class="modeBtn" id="btnModeAll">Mode: POLA ALL (M1-M3)</button>
+    <button class="modeBtn" id="btnModeM1">Mode: POLA M1 ONLY</button>
+    <hr style="border:none;border-top:1px solid rgba(255,255,255,0.03);margin:12px 0">
+    <div class="muted">Admin / Sewa</div>
+    <div style="margin-top:8px"><button class="btn" id="openAdminPanel">Open Admin Panel</button></div>
+    <div style="margin-top:12px" class="muted">Pengaturan Cepat</div>
+    <label style="display:block;margin-top:8px">Zona waktu</label>
+    <select id="globalTz" style="width:100%;margin-top:6px"><option value="WIB">WIB (UTC+7)</option><option value="WITA">WITA (UTC+8)</option></select>
+    <div style="margin-top:12px">
+      <button onclick="renterLogout()" style="margin-top:10px;padding:8px 15px;border-radius:8px;border:none;background:#ff4444;color:white;">Logout</button>
+      <button class="btn" id="closeDrawerBtn">Tutup Menu</button>
+    </div>
+  </aside>
+
+  <main class="container" id="mainContainer">
+    <section class="panel" id="panelAll">
+      <h2 style="margin:0 0 6px">Pola All (M1 - M3)</h2>
+
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+        <div class="muted">Zona:</div>
+        <select id="tz_all"><option value="WIB">WIB</option><option value="WITA">WITA</option></select>
+        <div class="muted" id="clock_all" style="margin-left:auto">--:--</div>
+      </div>
+
+      <label class="muted">Masukkan M1, M2, (M3 opsional)</label>
+      <div style="display:flex;gap:8px;margin-top:6px">
+        <input id="m1_all" class="small-input" type="number" min="9" max="54" placeholder="M1">
+        <input id="m2_all" class="small-input" type="number" min="9" max="54" placeholder="M2">
+        <input id="m3_all" class="small-input" type="number" min="9" max="54" placeholder="M3">
+      </div>
+
+      <div class="checks">
+        <label><input id="ultraAI_all" type="checkbox" checked> Ultra Pro AI</label>
+        <label><input id="deviceLogic_all" type="checkbox"> Full Device Logic</label>
+        <label><input id="useRacikan_all" type="checkbox" checked> Pakai Racikan</label>
+      </div>
+
+      <div style="margin-top:10px;display:flex;gap:8px">
+        <button class="btn" id="btn_all_predict">Prediksi Sekarang</button>
+        <button class="btn" id="btn_all_clear">Clear History</button>
+      </div>
+
+      <div class="resultBox">
+        <div id="pred_all" class="pred">-</div>
+        <div id="prob_all" class="muted">Probabilitas: -</div>
+        <div id="reason_all" class="muted" style="margin-top:8px">Alasan: -</div>
+      </div>
+
+      <div style="margin-top:12px">
+        <div class="muted">History</div>
+        <div id="history_all" class="history-box"></div>
+      </div>
+    </section>
+
+    <section class="panel" id="panelM1" style="display:none">
+      <h2 style="margin:0 0 6px">Pola M1 Only</h2>
+
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+        <div class="muted">Zona:</div>
+        <select id="tz_m1"><option value="WIB">WIB</option><option value="WITA">WITA</option></select>
+        <div class="muted" id="clock_m1" style="margin-left:auto">--:--</div>
+      </div>
+
+      <label class="muted">Device</label>
+      <select id="device_m1" style="width:160px;margin-top:6px">
+        <option value="XR">Fresh XR</option>
+        <option value="XS">Fresh XS</option>
+        <option value="IP11">Fresh IP 11-12</option>
+        <option value="IP14">Fresh IP 14-16</option>
+        <option value="REDMI">Fresh Redmi Note</option>
+        <option value="POVA">Fresh Tecno Pova</option>
+        <option value="SPARK">Fresh Tecno Spark</option>
+        <option value="OPPO">Fresh Oppo</option>
+        <option value="ROG">Fresh ROG</option>
+        <option value="ITEL">Fresh Itel</option>
+        <option value="REALME">Fresh Realme</option>
+        <option value="VIVO">Fresh Vivo</option>
+      </select>
+
+      <div style="margin-top:10px">
+        <label class="muted">Masukkan M1 (9-54)</label>
+        <div style="display:flex;gap:8px;margin-top:6px">
+          <input id="m1_only" type="number" min="9" max="54" placeholder="M1">
+          <button class="btn" id="btn_m1_predict">Prediksi</button>
+        </div>
+      </div>
+
+      <div style="margin-top:10px;display:flex;gap:8px;align-items:center">
+        <label class="muted"><input id="useRacikan_m1" type="checkbox" checked> Pakai Racikan</label>
+        <label class="muted"><input id="ultraAI_m1" type="checkbox" checked> Ultra smoothing</label>
+      </div>
+
+      <div class="resultBox">
+        <div id="pred_m1" class="pred">-</div>
+        <div id="prob_m1" class="muted">Probabilitas: -</div>
+        <div id="reason_m1" class="muted" style="margin-top:8px">Alasan: -</div>
+      </div>
+    </section>
+  </main>
+
+  <div class="footer">VERA Engine • Gabungan • v1.0</div>
+
+  <section class="panel" id="panelAdmin" style="display:none; position:fixed; right:18px; top:80px; width:360px; max-width:90%; z-index:998;">
+    <h3 style="margin:0 0 8px">Admin Sewa (Owner)</h3>
+    <div class="muted">Owner login</div>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <input id="ownerEmail" placeholder="owner@you.com" style="flex:1">
+      <input id="ownerPass" placeholder="password" type="password" style="flex:1">
+    </div>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button class="btn" id="btnOwnerLogin">Login Owner</button>
+      <button class="btn" id="btnOwnerLogout">Logout</button>
+      <button class="btn" id="btnToggleAdmin">Tutup</button>
+    </div>
+
+    <div id="adminControls" style="margin-top:12px;display:none">
+      <div class="muted">Buat user sewa</div>
+      <input id="newUsername" placeholder="username" style="width:100%;margin-top:8px">
+      <input id="newPass" placeholder="password" type="text" style="width:100%;margin-top:8px">
+      <label class="muted" style="margin-top:8px">Expired (tanggal)</label>
+      <input id="newExpire" type="date" style="width:100%;margin-top:6px">
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button class="btn" id="btnCreateUser">Buat User</button>
+        <button class="btn" id="btnRefreshUsers">Refresh</button>
+      </div>
+
+      <div style="margin-top:12px" class="muted">Daftar user</div>
+      <div id="adminUserList" class="history-box"></div>
+    </div>
+  </section>
+
+  <!-- RENTER LOGIN PAGE (FIXED) -->
+<section id="renterLoginPage" 
+style="position:fixed;top:0;left:0;width:100%;height:100%;background:#0d0d0d;display:none;flex-direction:column;justify-content:center;align-items:center;z-index:999999;">
+
+    <h2 style="color:white;margin-bottom:12px;">Login Pengguna</h2>
+
+    <input id="rentUser" placeholder="Username" 
+    style="padding:10px;width:70%;max-width:300px;margin:6px 0;border-radius:8px;border:none;">
+
+    <input id="rentPass" type="password" placeholder="Password" 
+    style="padding:10px;width:70%;max-width:300px;margin:6px 0;border-radius:8px;border:none;">
+
+    <button onclick="doRenterLogin()" 
+    style="padding:10px 20px;border-radius:8px;border:none;margin-top:8px;background:#fff;color:#000;font-weight:bold;">
+        Login
+    </button>
+
+    <div id="renterMsg" style="color:#ff4444;margin-top:10px;"></div>
+
+    <button onclick="openAdminFromRenter()" 
+    style="position:absolute;top:10px;right:10px;background:none;border:none;color:#999;font-size:12px;">
+        Admin
+    </button>
+
+</section>
+
+  <script type="module">
+  // ---------- Shared patterns & helpers ----------
+  const quickFixed = new Map([[32,'K'],[31,'B'],[26,'B'],[29,'B'],[33,'B'],[28,'K'],[34,'K'],[37,'K'],[35,'B'],[22,'B'],[23,'K'],[21,'K'],[24,'K'],[39,'K'],[36,'K']]);
+  const racikanRanges = [
+    ['00:00','01:00','B'],['01:00','02:30','K'],['02:30','03:00','B'],['03:00','04:00','K'],
+    ['04:00','04:50','B'],['04:50','05:30','B'],['05:30','06:15','K'],['06:15','07:30','B'],
+    ['07:30','08:30','K'],['08:30','10:00','B'],['10:00','12:00','K'],['12:00','13:00','B'],
+    ['13:00','14:00','K'],['14:00','15:00','B'],['15:00','16:30','K'],['16:30','17:50','B'],
+    ['17:50','18:55','K'],['18:55','19:30','K'],['19:30','20:00','B'],['20:00','21:00','K'],
+    ['21:00','22:00','B'],['22:00','23:00','B'],['23:00','24:00','K']
+  ];
+
+  function nowInZone(zone){
+    let now = new Date();
+    let utc = now.getTime() + (now.getTimezoneOffset()*60000);
+    let offset = (zone === 'WITA')?8:7;
+    return new Date(utc + (3600000 * offset));
+  }
+  function formatHM(dt){ return dt.getHours().toString().padStart(2,'0') + ':' + dt.getMinutes().toString().padStart(2,'0'); }
+  function findRacikanPrediction(timeStr){
+    const [h,m] = timeStr.split(':').map(Number);
+    const minutes = h*60 + m;
+    for(const [s,e,val] of racikanRanges){
+      const [sh,sm] = s.split(':').map(Number);
+      const [eh,em] = e.split(':').map(Number);
+      const start = sh*60 + sm;
+      const end = (eh===0? 24*60 : eh*60 + em);
+      if(minutes >= start && minutes < end) return val;
+    }
+    return null;
+  }
+  function minuteBucket(min){
+    if(min>=0 && min<=6) return 'K';
+    if(min>=7 && min<=16) return 'K';
+    if(min>=17 && min<=25) return 'B';
+    if(min>=26 && min<=36) return 'B';
+    if(min>=37 && min<=45) return 'K';
+    if(min>=46 && min<=54) return 'B';
+    if(min>=55 && min<=59) return 'B';
+    return 'K';
+  }
+  const deviceMap = { XR:'B', XS:'B', IP11:'K', IP14:'B', REDMI:'K', POVA:'B', SPARK:'K', OPPO:'K', ROG:'K', ITEL:'K', REALME:'K', VIVO:'K' };
+  function minutePattern(min){ return (min>=55 || min<=24)?'K':'B'; }
+
+  // ---------- Drawer & overlay logic ----------
+  const drawer = document.getElementById('drawer');
+  const overlay = document.getElementById('overlay');
+  const openDrawerBtn = document.getElementById('openDrawer');
+  const closeDrawerBtn = document.getElementById('closeDrawerBtn');
+  openDrawerBtn.addEventListener('click', ()=>{drawer.classList.add('open');overlay.style.display = 'block';document.body.style.overflow = 'hidden';drawer.setAttribute('aria-hidden','false');});
+  function closeDrawer(){drawer.classList.remove('open');overlay.style.display = 'none';document.body.style.overflow = 'auto';drawer.setAttribute('aria-hidden','true');}
+  closeDrawerBtn.addEventListener('click', closeDrawer);
+  overlay.addEventListener('click', closeDrawer);
+  document.addEventListener('click',(e)=>{if(drawer.classList.contains('open')){if(!drawer.contains(e.target) && !openDrawerBtn.contains(e.target)){closeDrawer();}}});
+
+  // panel switching
+  const btnModeAll = document.getElementById('btnModeAll');
+  const btnModeM1 = document.getElementById('btnModeM1');
+  const panelAll = document.getElementById('panelAll');
+  const panelM1 = document.getElementById('panelM1');
+  btnModeAll.addEventListener('click', ()=>{ panelAll.style.display='block'; panelM1.style.display='none'; closeDrawer(); });
+  btnModeM1.addEventListener('click', ()=>{ panelAll.style.display='none'; panelM1.style.display='block'; closeDrawer(); });
+
+  // global tz sync
+  const globalTz = document.getElementById('globalTz');
+  globalTz.addEventListener('change', ()=>{document.getElementById('tz_all').value = globalTz.value;document.getElementById('tz_m1').value = globalTz.value;updateClocks();});
+
+  // ---------- M1 engine & UI (unchanged) ----------
+  const tz_m1 = document.getElementById('tz_m1'); const clock_m1 = document.getElementById('clock_m1');
+  const m1_only = document.getElementById('m1_only'); const device_m1 = document.getElementById('device_m1');
+  const btn_m1_predict = document.getElementById('btn_m1_predict');
+  const pred_m1 = document.getElementById('pred_m1'); const prob_m1 = document.getElementById('prob_m1'); const reason_m1 = document.getElementById('reason_m1');
+
+  function enginePredictM1({m1, zone, ultraAI, useRacikan, device}){
+    m1 = Number(m1);
+    if(quickFixed.has(m1)) return {pred: quickFixed.get(m1), prob:95, reason:`Fixed rule ${m1}`};
+    const sideByValue = (m1>=32)?'B':'K';
+    let prob = 60;
+    const devSide = deviceMap[device] || null;
+    if(devSide){ if(devSide===sideByValue) prob += 12; else prob -= 8; }
+    const timeStr = formatHM(nowInZone(zone));
+    if(useRacikan){ const rac = findRacikanPrediction(timeStr); if(rac){ if(rac===sideByValue) prob += 18; else prob -= 12; } }
+    let m = nowInZone(zone).getMinutes(); const mb = minuteBucket(m); if(mb===sideByValue) prob += 6; else prob -= 4;
+    const minuteSide = minutePattern(m); if(minuteSide===sideByValue) prob +=4; else prob -=2;
+    if(ultraAI) prob = Math.min(98, Math.max(40, prob + (sideByValue==='B'?4:-4)));
+    prob = Math.round(Math.max(10, Math.min(98, prob)));
+    return {pred: sideByValue, prob:prob, reason:`val(${m1})->${sideByValue}, dev:${devSide||'-'}, rac:${findRacikanPrediction(timeStr)||'-'}, mb:${mb}`};
+  }
+
+  btn_m1_predict.addEventListener('click', ()=>{
+    const v = Number(m1_only.value);
+    if(!v){ alert('Masukkan M1 (9-54)'); return; }
+    const out = enginePredictM1({m1: v, zone: tz_m1.value, ultraAI: document.getElementById('ultraAI_m1').checked, useRacikan: document.getElementById('useRacikan_m1').checked, device: device_m1.value});
+    pred_m1.innerText = out.pred; pred_m1.className = 'pred ' + out.pred;
+    prob_m1.innerText = `Probabilitas: ${out.prob}%`; reason_m1.innerText = `Alasan: ${out.reason}`;
+  });
+
+  // ---------- ALL / M3 engine & UI (updated pola implemented) ----------
+  const tz_all = document.getElementById('tz_all'); const clock_all = document.getElementById('clock_all');
+  const m1_all = document.getElementById('m1_all'); const m2_all = document.getElementById('m2_all'); const m3_all = document.getElementById('m3_all');
+  const btn_all_predict = document.getElementById('btn_all_predict'); const btn_all_clear = document.getElementById('btn_all_clear');
+  const pred_all = document.getElementById('pred_all'); const prob_all = document.getElementById('prob_all'); const reason_all = document.getElementById('reason_all'); const history_all = document.getElementById('history_all');
+  let historyAll = [];
+
+  // pola angka tables for ANDRO & IP (from user's input)
+  const polaAngkaAndro = {32:'K',31:'B',26:'K',29:'B',33:'K',28:'K',34:'K',37:'K',35:'B',22:'B',23:'B',21:'B',24:'K',39:'K',36:'B',20:'B',27:'K',30:'B',40:'B',41:'K',42:'B',25:'B',38:'K',44:'B',45:'K'};
+  const polaAngkaIP = {32:'K',31:'B',26:'K',29:'B',33:'K',28:'K',34:'B',37:'B',35:'K',22:'K',23:'B',21:'K',24:'B',39:'K',36:'K',20:'B',27:'B',30:'K',40:'B',41:'K',42:'B',43:'K',44:'B',45:'B',19:'K',38:'B',25:'K'};
+
+  function polaMenit(m){ if(m>=0 && m<=6) return 'K'; if(m>=7 && m<=16) return 'B'; if(m>=17 && m<=25) return 'K'; if(m>=26 && m<=36) return 'B'; if(m>=37 && m<=45) return 'K'; return 'B'; }
+
+  function polaAngkaAuto(x){
+    const ua = navigator.userAgent.toLowerCase();
+    const isAndroid = ua.includes('android');
+    const table = isAndroid ? polaAngkaAndro : polaAngkaIP;
+    return table[x] || 'B';
+  }
+
+  function enginePredictAll({m1,m2,m3, zone, ultraAI, deviceLogic, useRacikan}){
+    m1 = Number(m1); m2 = Number(m2); m3 = (m3==='')? null : Number(m3);
+    // fixed check
+    if(polaAngkaAndro[m1] || polaAngkaIP[m1]) return {pred: polaAngkaAuto(m1), prob:92, reason:`Fixed ${m1}`};
+    if(polaAngkaAndro[m2] || polaAngkaIP[m2]) return {pred: polaAngkaAuto(m2), prob:92, reason:`Fixed ${m2}`};
+    if(m3!==null && (polaAngkaAndro[m3] || polaAngkaIP[m3])) return {pred: polaAngkaAuto(m3), prob:92, reason:`Fixed ${m3}`};
+
+    const vals = [m1,m2]; if(m3!==null) vals.push(m3);
+    let countB = vals.filter(v=>v>=32).length; let countK = vals.filter(v=>v<=31).length; const signals=[];
+    if(countB>countK) signals.push({label:'majority-dice',weight:3,side:'B'}); else if(countK>countB) signals.push({label:'majority-dice',weight:3,side:'K'}); else signals.push({label:'tie',weight:1,side: (vals[vals.length-1]>=32?'B':'K')});
+    let trendScore=0; for(let i=1;i<vals.length;i++){ trendScore += (vals[i]>vals[i-1])?1: (vals[i]<vals[i-1])?-1:0; }
+    if(trendScore>=2) signals.push({label:'vera-up',weight:3,side:'B'}); else if(trendScore<=-2) signals.push({label:'vera-down',weight:3,side:'K'});
+    else if(trendScore===1) signals.push({label:'vera-wup',weight:1.5,side:'B'}); else if(trendScore===-1) signals.push({label:'vera-wdown',weight:1.5,side:'K'});
+    if(vals.length>=2){ const s1=(vals[0]>=32)?'B':'K'; const s2=(vals[1]>=32)?'B':'K'; if(s1===s2) signals.push({label:'joe-repeat',weight:0.6,side:s2}); }
+    if(trendScore===0){ const lastSide=(vals[vals.length-1]>=32)?'B':'K'; signals.push({label:'last-bias',weight:1.2,side:lastSide}); }
+    const timeStr = formatHM(nowInZone(zone)); if(useRacikan){ const rac=findRacikanPrediction(timeStr); if(rac) signals.push({label:'racikan-time',weight:2.2,side:rac}); }
+    if(deviceLogic){ const mn = nowInZone(zone).getMinutes(); const mb = minuteBucket(mn); signals.push({label:'minute-bucket',weight:1.4,side:mb}); }
+    let scoreB=0, scoreK=0; for(const s of signals){ if(s.side==='B') scoreB += s.weight; else scoreK += s.weight; }
+    let probB=50; if(scoreB+scoreK>0) probB = Math.round( (scoreB/(scoreB+scoreK)) * 100 );
+    if(ultraAI){
+      for(const s of signals){ if(s.label==='majority-dice'){ if(s.side==='B') probB = Math.min(99, probB+6); else probB = Math.max(1, probB-6); } if(s.label==='vera-up') probB = Math.min(99, probB+8); if(s.label==='vera-down') probB = Math.max(1, probB-8); if(s.label==='racikan-time'){ if(s.side==='B') probB = Math.min(97, probB+4); else probB = Math.max(3, probB-4); } }
+      const total = probB + (100-probB);
+      probB = Math.round((probB/total)*100);
+    }
+    const final = (probB>50)?'B':'K';
+    const reason = signals.map(s=>`${s.label}(${s.side},w=${s.weight})`).join(', ');
+    return {pred:final, prob:probB, reason:reason};
+  }
+
+  btn_all_predict.addEventListener('click', ()=>{
+    const a = m1_all.value ? Number(m1_all.value) : null;
+    const b = m2_all.value ? Number(m2_all.value) : null;
+    if(!a || !b){ alert('Masukkan minimal M1 dan M2'); return; }
+    const out = enginePredictAll({ m1:a, m2:b, m3:m3_all.value, zone: tz_all.value, ultraAI: document.getElementById('ultraAI_all').checked, deviceLogic: document.getElementById('deviceLogic_all').checked, useRacikan: document.getElementById('useRacikan_all').checked });
+    pred_all.innerText = out.pred; pred_all.className = 'pred ' + out.pred; prob_all.innerText = `Probabilitas B: ${out.prob}%`; reason_all.innerText = `Alasan: ${out.reason}`;
+    const stamp = formatHM(nowInZone(tz_all.value));
+    historyAll.unshift({time:stamp,m1:a,m2:b,m3:m3_all.value,pred:out.pred,prob:out.prob,reason:out.reason}); if(historyAll.length>200) historyAll.pop(); renderHistoryAll(); document.querySelector('.footer').innerText = `VERA Engine • Gabungan • Last: ${stamp}`;
+  });
+
+  btn_all_clear.addEventListener('click', ()=>{ historyAll=[]; renderHistoryAll(); });
+
+  function renderHistoryAll(){ history_all.innerHTML=''; for(const h of historyAll){ const d=document.createElement('div'); d.style.padding='6px'; d.style.borderBottom='1px dashed rgba(255,255,255,0.03)'; d.innerHTML = `<strong>${h.time}</strong> — M1:${h.m1} M2:${h.m2} ${h.m3? 'M3:'+h.m3 : ''} → <span style="color:${h.pred==='B'? '#00ff85':'#ff6b6b'}; font-weight:800">${h.pred}</span> (${h.prob}%)<div class='muted' style='margin-top:6px;font-size:12px'>${h.reason}</div>`; history_all.appendChild(d); } }
+
+  // ---------- clocks ----------
+  function updateClocks(){ const dt_m1 = nowInZone(document.getElementById('tz_m1').value || 'WIB'); const dt_all = nowInZone(document.getElementById('tz_all').value || 'WIB'); const cm1 = document.getElementById('clock_m1'); if(cm1) cm1.innerText = formatHM(dt_m1); const call = document.getElementById('clock_all'); if(call) call.innerText = formatHM(dt_all); }
+  setInterval(updateClocks,1000); updateClocks();
+
+  // ---------- FIREBASE (unchanged) ----------
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js';
+  import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js';
+  import { getFirestore, doc, setDoc, getDoc, collection, query, where, getDocs, orderBy, deleteDoc } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js';
+
+  const firebaseConfig = { apiKey: "AIzaSyDEAs9GWmV3qJUa18PIgB75_s48-Ur52eg", authDomain: "veradepelopee.firebaseapp.com", projectId: "veradepelopee", storageBucket: "veradepelopee.firebasestorage.app", messagingSenderId: "117911642882", appId: "1:117911642882:web:bc377003479193b2a5981b", measurementId: "G-GR5JE7CQZS" };
+
+  let app, auth, db; try{ app = initializeApp(firebaseConfig); auth = getAuth(app); db = getFirestore(app); console.log('Firebase initialized'); } catch(e){ console.warn('Firebase init error', e); }
+
+  // admin panel wiring
+  const openAdminPanelBtn = document.getElementById('openAdminPanel');
+  const panelAdmin = document.getElementById('panelAdmin');
+  const btnToggleAdmin = document.getElementById('btnToggleAdmin');
+  const btnOwnerLogin = document.getElementById('btnOwnerLogin');
+  const btnOwnerLogout = document.getElementById('btnOwnerLogout');
+  const adminControls = document.getElementById('adminControls');
+  const ownerEmail = document.getElementById('ownerEmail');
+  const ownerPass = document.getElementById('ownerPass');
+  const newUsername = document.getElementById('newUsername');
+  const newPass = document.getElementById('newPass');
+  const newExpire = document.getElementById('newExpire');
+  const btnCreateUser = document.getElementById('btnCreateUser');
+  const adminUserList = document.getElementById('adminUserList');
+  const btnRefreshUsers = document.getElementById('btnRefreshUsers');
+
+  async function sha256hex(str){ const enc = new TextEncoder(); const data = enc.encode(str); const hash = await crypto.subtle.digest('SHA-256', data); return Array.from(new Uint8Array(hash)).map(b=>b.toString(16).padStart(2,'0')).join(''); }
+
+  openAdminPanelBtn.addEventListener('click', ()=>{ panelAdmin.style.display = 'block'; }); btnToggleAdmin.addEventListener('click', ()=>{ panelAdmin.style.display = 'none'; });
+
+  btnOwnerLogin.addEventListener('click', async ()=>{ const email = ownerEmail.value; const pass = ownerPass.value; if(!email || !pass){ alert('Masukkan email & password owner'); return; } try{ const cred = await signInWithEmailAndPassword(auth, email, pass); alert('Owner logged in'); } catch(err){ console.error(err); alert('Login owner gagal: '+err.message); } });
+  btnOwnerLogout.addEventListener('click', async ()=>{ try{ await signOut(auth); alert('Logged out'); }catch(e){ console.warn(e); } });
+
+  onAuthStateChanged(auth, user=>{ if(user){ adminControls.style.display = 'block'; fetchUsers(); } else { adminControls.style.display = 'none'; } });
+
+  // expose admin login function to global scope for non-module onclick handlers
+  window.loginNow = async function(){
+    const u = document.getElementById('userLogin') ? document.getElementById('userLogin').value.trim() : '';
+    const p = document.getElementById('passLogin') ? document.getElementById('passLogin').value.trim() : '';
+
+    // prefer Firebase auth if initialized
+    if(auth){
+      try{
+        await signInWithEmailAndPassword(auth, u, p);
+        localStorage.setItem('loggedIn','true');
+        document.getElementById('loginPage') && (document.getElementById('loginPage').style.display='none');
+        document.getElementById('mainPage') && (document.getElementById('mainPage').style.display='block');
+        alert('Admin logged in (Firebase)');
+        return;
+      } catch(err){
+        console.warn('Firebase admin login failed:', err.message);
+        // fallthrough to local framework fallback
+      }
+    }
+
+    // Fallback: framework auto-create admin in localStorage
+    const savedU = localStorage.getItem('fw_user');
+    const savedP = localStorage.getItem('fw_pass');
+    if(!savedU){
+      if(!u || !p) return alert('Masukkan username & password untuk membuat akun admin pertama');
+      localStorage.setItem('fw_user', u);
+      localStorage.setItem('fw_pass', p);
+      localStorage.setItem('loggedIn','true');
+      alert('Akun admin dibuat & login berhasil (local fallback)');
+      document.getElementById('loginPage') && (document.getElementById('loginPage').style.display='none');
+      document.getElementById('mainPage') && (document.getElementById('mainPage').style.display='block');
+      return;
+    }
+
+    if(u === savedU && p === savedP){
+      localStorage.setItem('loggedIn','true');
+      document.getElementById('loginPage') && (document.getElementById('loginPage').style.display='none');
+      document.getElementById('mainPage') && (document.getElementById('mainPage').style.display='block');
+      alert('Admin logged in (local)');
+      return;
+    }
+    alert('Username atau password salah');
+  };
+
+  btnCreateUser.addEventListener('click', async ()=>{ if(!db){ alert('Firestore not initialized. Check firebaseConfig.'); return; } const u = newUsername.value.trim(); const p = newPass.value.trim(); const ex = newExpire.value; if(!u || !p || !ex){ alert('Lengkapi username, password, dan tanggal expired'); return; } try{ const passHash = await sha256hex(p); const expiresAt = new Date(ex + 'T23:59:59').getTime(); await setDoc(doc(db,'rented_users', u), { username:u, passHash:passHash, expiresAt: expiresAt, createdAt: Date.now(), createdBy: auth.currentUser ? auth.currentUser.uid : 'owner' }); alert('User dibuat: '+u); newUsername.value=''; newPass.value=''; newExpire.value=''; fetchUsers(); } catch(err){ console.error(err); alert('Gagal membuat user: '+err.message); } });
+
+  async function fetchUsers(){ adminUserList.innerHTML='Loading...'; try{ const colRef = collection(db,'rented_users'); const snaps = await getDocs(query(colRef, orderBy('createdAt','desc'))); adminUserList.innerHTML = ''; snaps.forEach(docSnap=>{ const d = docSnap.data(); const row = document.createElement('div'); row.style.padding='8px'; row.style.borderBottom='1px dashed rgba(255,255,255,0.03)'; const exp = new Date(d.expiresAt).toLocaleString(); row.innerHTML = `<strong>${d.username}</strong> — expires: ${exp} <br><button data-username='${d.username}' class='btnDel'>Hapus</button>`; adminUserList.appendChild(row); }); adminUserList.querySelectorAll('.btnDel').forEach(b=> b.addEventListener('click', async (e)=>{ const uname = e.target.getAttribute('data-username'); if(!confirm('Hapus user '+uname+'?')) return; try{ await deleteDoc(doc(db,'rented_users',uname)); fetchUsers(); }catch(err){ console.error(err); alert('Gagal hapus: '+err.message);} })); } catch(err){ console.error(err); adminUserList.innerText = 'Gagal ambil user: '+err.message; } }
+
+  btnRefreshUsers.addEventListener('click', ()=> fetchUsers());
+
+  async function renterLogin(username, password){ if(!db) throw new Error('Firestore not initialized'); const docRef = doc(db,'rented_users', username); const snap = await getDoc(docRef); if(!snap.exists()) throw new Error('User tidak ditemukan'); const data = snap.data(); const hash = await sha256hex(password); if(hash !== data.passHash) throw new Error('Password salah'); if(Date.now() > data.expiresAt) throw new Error('Sewa telah kadaluarsa'); return { username: data.username, expiresAt: data.expiresAt }; }
+  window.renterLogin = renterLogin;
+
+  // renter modal wiring
+  document.getElementById('openRenterLogin').addEventListener('click', ()=>{ document.getElementById('renterLoginPage').style.display='flex'; });
+
+  let renterActive=null; async function doRenterLogin(){ const u=document.getElementById('rentUser').value.trim(); const p=document.getElementById('rentPass').value.trim(); const m=document.getElementById('renterMsg'); try{ const r=await window.renterLogin(u,p); renterActive=r; document.getElementById('renterLoginPage').style.display='none'; localStorage.setItem('renter_username', r.username); localStorage.setItem('renter_expires', r.expiresAt); }catch(e){ m.innerText=e.message; } }
+  function openAdminFromRenter(){ document.getElementById('panelAdmin').style.display='block'; }
+  function renterLogout(){ localStorage.removeItem('renter_username'); localStorage.removeItem('renter_expires'); alert('Logout berhasil'); document.getElementById('renterLoginPage').style.display='flex'; }
+
+  // --- local sewa users (optional fallback) ---
+  if (!localStorage.getItem('sewaUsers')) { localStorage.setItem('sewaUsers', JSON.stringify({})); }
+  function addSewaUser() { const u = prompt('Masukkan username penyewa:'); const p = prompt('Masukkan password penyewa:'); if (!u || !p) return alert('Username & password wajib diisi'); const users = JSON.parse(localStorage.getItem('sewaUsers')); if (users[u]) return alert('User sudah ada!'); users[u] = p; localStorage.setItem('sewaUsers', JSON.stringify(users)); alert('User sewa dibuat: ' + u); }
+
+  // show sewa login button
+  function showSewaLogin(){ document.getElementById('renterLoginPage').style.display='flex'; }
+  function hideSewaLogin(){ document.getElementById('renterLoginPage').style.display='none'; }
+
+  // simple admin login (hardcoded)
+  function loginNow(){
+  const u = document.getElementById('userLogin').value.trim();
+  const p = document.getElementById('passLogin').value.trim();
+
+  const savedU = localStorage.getItem('fw_user');
+  const savedP = localStorage.getItem('fw_pass');
+
+  if(!savedU){
+    if(!u || !p) return alert('Masukkan username & password untuk membuat akun admin pertama');
+    localStorage.setItem('fw_user', u);
+    localStorage.setItem('fw_pass', p);
+    localStorage.setItem('loggedIn','true');
+    alert('Akun admin dibuat & login berhasil');
+    document.getElementById('loginPage').style.display='none';
+    document.getElementById('mainPage').style.display='block';
+    return;
+  }
+
+  if(u === savedU && p === savedP){
+    localStorage.setItem('loggedIn','true');
+    document.getElementById('loginPage').style.display='none';
+    document.getElementById('mainPage').style.display='block';
+  } else {
+    alert('Username atau password salah');
+  }
+} alert('Username atau password salah'); }
+
+  // enforce login: if neither admin nor renter logged in, hide main panels
+  window.addEventListener('load',()=>{
+    const admin = localStorage.getItem('loggedIn');
+    const sewa = localStorage.getItem('renter_username') || localStorage.getItem('sewaLogged');
+    if(!admin && !sewa){ document.getElementById('loginPage').style.display='block'; document.getElementById('mainPage').style.display='none'; }
+    else { document.getElementById('loginPage').style.display='none'; document.getElementById('mainPage').style.display='block'; }
+  });
+
+  // checkbox active effect (delegate safely)
+  ['ultraAI_all','deviceLogic_all','useRacikan_all','useRacikan_m1','ultraAI_m1'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(!el) return;
+    el.addEventListener('change', ()=>{
+      const lab = el.parentElement;
+      if(lab && lab.tagName==='LABEL') lab.classList.toggle('active', el.checked);
+    });
+  });
+
+  </script>
+</body>
+</html>
